@@ -32,8 +32,8 @@ for each file in dstFileList
 		wscript.echo "nothing choosed"
 	End if
 	
-	' close file
-	xlFile.Close()
+	' close file without saving
+	xlFile.Close(False)
 next
 
 if Err.Number <> 0 then

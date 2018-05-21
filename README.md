@@ -66,9 +66,29 @@ In the example,I'm trying to search the name of tables under a header--"list",li
 
 from `(cell.row + 0, cell.column + 0)`  to `(cell.row + 4, cell.column + 3)`
 
+### Others
+
+- If you are using git-shell or something similar, you still need to enter then windows-style path in the parameters of this script. In addition, in order to ensure that git-shell ,which display text with utf-8 ,can display another encoding properly, you may need to to these:
+
+  - Convert the file to `ANSI` and select an encoding such as GBK  or Shift-JIS until you can see normal text .
+
+    - the appropriate text encoding depends on the region.
+    - notepad++ is recommended
+
+  - use a pipeline command
+
+    ```shell 
+    cscript ./dev.vbs get .\*\*.xlsx 1 "A1" | iconv -c -f Shift-JIS -t UTF-8
+    ```
+
+    - this convert the output of `dev.vbs` from `Shift-JIS` into `UTF-8` and skip the text that failed to convert
+
 ### TODO
 
 add find-and-replace functions(the following is examples)
+
+- make it work under git-shell (using a unix-style path as parameter)
+
 
 - replace all a to b
 - replace [a,b,c,d] to [a1,b,c1,d1] if there is a [a1,b,c1,d1] in another file.
