@@ -1,22 +1,37 @@
 # Morph
 Unix-like VBS function shortcuts
 
-### purpose
+### Purpose
 
 - To create a way to edit excel files just like plain text files, especially if the files you want to edit are scattered in different places and your computer is slow like a snail
 - To extract pleasure from what is a bitter life to others(now, in Japan).
 
-### usage
+### Usage
 
-here is a **short** list for all the functions available.
+Here is a **short** list for all the functions available.
 
 - get
+- set
 - grep
 - incre
+- replace
+
+### Basic functions
+
+Three parameters are required to accomplish the basic functions
+
+```powershell
+cscript .\dev.vbs <operation> <globPath> <sheetOrder>
+```
+
+- This will execute the chosen operation on each matched files
+- Wildcards are supported here to match file names
+
+### Operations
 
 ##### get
 
-Get the value of a specified position in files that matched by wildcard
+Get the value of a specified position in files
 
 ```powershell
 cscript .\dev.vbs get .\*\*.xlsx 1 "A1"
@@ -27,6 +42,17 @@ cscript .\dev.vbs get .\*\*.xlsx 1 "A1"
 - `.\*\*.xlsx` path with wildcard
 - `1` order of sheet inside excel file
 - `"A1"` the specified location mentioned above
+
+##### set
+
+Set the value of a specified positon in files
+
+```powershell
+cscript .\dev.vbs set .\*\*.xlsx 1 "A1" "toString"
+```
+
+- Just like that in `get`
+- File will be saved by default, so remember to backup important files
 
 ##### grep
 
@@ -66,29 +92,35 @@ In the example,I'm trying to search the name of tables under a header--"list",li
 
 from `(cell.row + 0, cell.column + 0)`  to `(cell.row + 4, cell.column + 3)`
 
+##### replace
+
+Replace all `fromString` with `toString` in the file, just like that in excel(with default option)
+
+```powershell
+cscript .\dev.vbs replace .\*\*.xlsx 1 "fromString" "toString"
+```
+
+- TODO: Show a counter if possible
+
 ### Others
 
-- If you are using git-shell or something similar, you still need to enter then windows-style path in the parameters of this script. In addition, in order to ensure that git-shell ,which display text with utf-8 ,can display another encoding properly, you may need to to these:
+- If you are using git-shell or something similar instead of windows powershell, you may need to pay attention to the problem of text encoding. In order to ensure that git-shell ,which display text with utf-8 ,can display another text encoding properly, you may need to do these:
 
-  - Convert the file to `ANSI` and select an encoding such as GBK  or Shift-JIS until you can see normal text .
+  - Convert the file to `ANSI` and select an encoding such as `GBK`  or `Shift-JIS` until you can see normal text .
 
-    - the appropriate text encoding depends on the region.
+    - The appropriate text encoding depends on the region.
     - notepad++ is recommended
 
-  - use a pipeline command
+  - Use a pipeline command to convert the output of VBS program
 
     ```shell 
     cscript ./dev.vbs get .\*\*.xlsx 1 "A1" | iconv -c -f Shift-JIS -t UTF-8
     ```
 
-    - this convert the output of `dev.vbs` from `Shift-JIS` into `UTF-8` and skip the text that failed to convert
+    - This convert the output of `dev.vbs` from `Shift-JIS` into `UTF-8` and skip the text that failed to convert by using option "-c".
 
 ### TODO
 
-add find-and-replace functions(the following is examples)
 
-- make it work under git-shell (using a unix-style path as parameter)
-
-
-- replace all a to b
+- replacement counter
 - replace [a,b,c,d] to [a1,b,c1,d1] if there is a [a1,b,c1,d1] in another file.

@@ -8,6 +8,7 @@ Dim operation,globPath,sheetOrder
 Dim lookCell
 Dim grepPattern
 Dim firstPattern,increPattern,offset,realOffset
+Dim fromString,toString
 
 
 ''' main
@@ -24,8 +25,12 @@ for each file in dstFileList
 	' do some operation
 	if operation = "get" then
 		doGet()
+	elseif operation = "set" then
+		doSet()
 	elseif operation = "grep" then
 		doGrep()
+	elseif operation = "replace" then
+		doReplace()
 	elseif operation = "incre" then
 		doIncre()
 	else
@@ -33,7 +38,11 @@ for each file in dstFileList
 	End if
 	
 	' close file without saving
-	xlFile.Close(False)
+	if operation = "set" Or operation = "replace" then
+		xlFile.Close(True)
+	else
+		xlFile.Close(False)
+	end if
 next
 
 if Err.Number <> 0 then
@@ -67,8 +76,14 @@ Sub init()
 	
 	if operation = "get" then
 		lookCell = wscript.Arguments(3)
+	elseif operation = "set" then
+		lookCell = wscript.Arguments(3)
+		toString = wscript.Arguments(4)
 	elseif operation = "grep" then
 		grepPattern = wscript.Arguments(3)
+	elseif operation = "replace" then
+		fromString = wscript.Arguments(3)
+		toString = wscript.Arguments(4)
 	elseif operation = "incre" then
 		firstPattern = wscript.Arguments(3)
 		increPattern = wscript.Arguments(5)
@@ -101,6 +116,10 @@ Sub doGet()
 	wscript.echo xlSheet.Range(lookCell).Value
 End Sub
 
+Sub doSet()
+	xlSheet.Range(lookCell).Value = toString
+End Sub
+
 Sub doGrep()
 	' find all cells
 	dim rng
@@ -114,6 +133,11 @@ Sub doGrep()
 	else
 		wscript.echo "can not find """ & grepPattern & """"
 	End If
+End Sub
+
+Sub doReplace()
+	' replace all cells
+	xlSheet.Cells.replace fromString,toString
 End Sub
 
 Sub doIncre()
