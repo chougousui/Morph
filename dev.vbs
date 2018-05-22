@@ -154,9 +154,16 @@ End Sub
 ' tools
 Sub matchFiles()
 	' convert wildcards to regular expressions (only for * here)
-	namePattern = replace(globPath,"\","\\")
-	namePattern = replace(namePattern,".","\.")
-	namePattern = replace(namePattern,"*",".*")
+	' turn unix-style path to windows-style path(just in the form of a string)
+	if InStr(globPath,"/") then
+		namePattern = replace(globPath,"/","\\")
+		namePattern = replace(namePattern,".","\.")
+		namePattern = replace(namePattern,"*",".*")
+	else
+		namePattern = replace(globPath,"\","\\")
+		namePattern = replace(namePattern,".","\.")
+		namePattern = replace(namePattern,"*",".*")
+	end if
 	
 	' get all files under nowpath
 	filetree(".")
