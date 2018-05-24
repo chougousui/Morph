@@ -5,7 +5,7 @@ Dim fileList
 Dim dstFileList
 
 Dim operation,globPath,sheetOrder
-Dim lookCell
+Dim searchRange
 Dim grepPattern
 Dim firstPattern,increPattern,offset,realOffset
 Dim fromString,toString
@@ -29,6 +29,10 @@ for each file in dstFileList
 		doSet()
 	elseif operation = "grep" then
 		doGrep()
+	elseif operation = "find" then
+		doFind()
+	elseif operation = "findComment" then
+		doFindComment()
 	elseif operation = "replace" then
 		doReplace()
 	elseif operation = "incre" then
@@ -75,12 +79,18 @@ Sub init()
 	sheetOrder = CInt(sheetOrder)
 	
 	if operation = "get" then
-		lookCell = wscript.Arguments(3)
+		searchRange = wscript.Arguments(3)
 	elseif operation = "set" then
-		lookCell = wscript.Arguments(3)
+		searchRange = wscript.Arguments(3)
 		toString = wscript.Arguments(4)
 	elseif operation = "grep" then
 		grepPattern = wscript.Arguments(3)
+	elseif operation = "find" then
+		grepPattern = wscript.Arguments(3)
+		searchRange = wscript.Arguments(4)
+	elseif operation = "findComment" then
+		grepPattern = wscript.Arguments(3)
+		searchRange = wscript.Arguments(4)
 	elseif operation = "replace" then
 		fromString = wscript.Arguments(3)
 		toString = wscript.Arguments(4)
@@ -113,11 +123,11 @@ Sub clean()
 End Sub
 
 Sub doGet()
-	wscript.echo xlSheet.Range(lookCell).Value
+	wscript.echo xlSheet.Range(searchRange).Value
 End Sub
 
 Sub doSet()
-	xlSheet.Range(lookCell).Value = toString
+	xlSheet.Range(searchRange).Value = toString
 End Sub
 
 Sub doGrep()
@@ -129,6 +139,37 @@ Sub doGrep()
 		Do
 			wscript.echo rng.value
 			set rng = xlSheet.Cells.findNext(rng)
+		Loop While rng.Address <> firstAddress
+	else
+		wscript.echo "can not find """ & grepPattern & """"
+	End If
+End Sub
+
+Sub doFind()
+	' find all cells
+	dim rng
+	set rng = xlSheet.Range(searchRange).find(grepPattern)
+	if not rng is nothing then
+		firstAddress = rng.Address
+		Do
+			wscript.echo rng.value
+			set rng = xlSheet.Range(searchRange).findNext(rng)
+		Loop While rng.Address <> firstAddress
+	else
+		wscript.echo "can not find """ & grepPattern & """"
+	End If
+End Sub
+
+Sub doFindComment()
+	' find all cells
+	dim rng
+	' -4144 means xlComment,
+	set rng = xlSheet.Range(searchRange).find(grepPattern,,-4144)
+	if not rng is nothing then
+		firstAddress = rng.Address
+		Do
+			wscript.echo rng.value
+			set rng = xlSheet.Range(searchRange).findNext(rng)
 		Loop While rng.Address <> firstAddress
 	else
 		wscript.echo "can not find """ & grepPattern & """"

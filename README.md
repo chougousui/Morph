@@ -13,6 +13,8 @@ Here is a **short** list for all the functions available.
 - get
 - set
 - grep
+- find
+- findComment
 - incre
 - replace
 
@@ -56,10 +58,26 @@ cscript .\dev.vbs set .\*\*.xlsx 1 "A1" "toString"
 
 ##### grep
 
-Find all cell contents in files if meet the preset match pattern.
+Find all cell contents in files.
 
 ```powershell
 cscript .\dev.vbs grep .\*\*.xlsx 1 "user-set-regex-pattern"
+```
+
+##### find
+
+Find all cell contents within a specified range.
+
+```powershell
+cscript .\dev.vbs find .\*\*.xlsx 1 "values" "A:B"
+```
+
+##### findComment
+
+Find all cell contents within a specified range, using a piece of comment.
+
+```powershell
+cscript .\dev.vbs findComment .\*\*.xlsx 1 "comment" "A:B"
 ```
 
 ##### incre
