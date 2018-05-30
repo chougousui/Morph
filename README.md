@@ -137,8 +137,15 @@ cscript .\dev.vbs replace .\*\*.xlsx 1 "fromString" "toString"
 
     - This convert the output of `dev.vbs` from `Shift-JIS` into `UTF-8` and skip the text that failed to convert by using option "-c".
 
+- Add a non-generic feature to the dev branch for filling in other forms based on an overview file
+
+  ```powershell
+  cscript ./dev.vbs fill .\test\*dstFile* 4 "D9" D:\srcFile.xlsx ALL
+  ```
+
+  
+
 ### TODO
 
 
 - replacement counter
-- replace [a,b,c,d] to [a1,b,c1,d1] if there is a [a1,b,c1,d1] in another file.
