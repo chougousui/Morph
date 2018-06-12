@@ -40,6 +40,10 @@ for each file in dstFileList
     else
         wscript.echo "no operation"
     End if
+	
+	' echo a null line
+	wscript.echo
+	
     ' close file without saving
     if operation = "set" Or operation = "replace" Or operation = "fill" then
         xlFile.Close(True)
