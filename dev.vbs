@@ -201,12 +201,13 @@ Sub matchFiles()
     if InStr(globPath,"/") then
         namePattern = replace(globPath,"/","\\")
         namePattern = replace(namePattern,".","\.")
-        namePattern = replace(namePattern,"*",".*")
+        namePattern = replace(namePattern,"*","[^\\]*")
     else
         namePattern = replace(globPath,"\","\\")
         namePattern = replace(namePattern,".","\.")
-        namePattern = replace(namePattern,"*",".*")
+        namePattern = replace(namePattern,"*","[^\\]*")
     end if
+    namePattern = namePattern & "xls"
     
     ' get all files under nowpath
     filetree(".")
