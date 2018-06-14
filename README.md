@@ -28,7 +28,10 @@ cscript .\dev.vbs <operation> <globPath> <sheetOrder>
 
 - This will execute the chosen operation on each matched files
 - Wildcards are supported here to match file names
-- both name and order can be used as locator of a sheet, and the script will print the sheet name for confirm.
+  - but `git-bash` will automatically parse the globPath and pass the first of the matched files to the program. The right way to pass globPath to script is to use `""` around the globPath, no matter what kind of style the path string is.
+  - match `xls,xlsx,xlsm` files by default. (otherwise it is not necessary to use VB Script)
+  - the globPath is set to be impermeable , which means you can match "./1/eg1.xls" with "./1/\*", but can not match "./1/1/eg2.xls" with the same "./1/\*", I know this is counter-intuitive, but you need to know that someone likes to place multiple backup folders in the same folder. Handling files under these subfolders is meaningless.
+- both name and order (starts from 1) can be used as locator of a sheet, and the script will print the sheet name for confirm.
 
 ### Operations
 
