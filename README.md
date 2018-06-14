@@ -28,6 +28,7 @@ cscript .\dev.vbs <operation> <globPath> <sheetOrder>
 
 - This will execute the chosen operation on each matched files
 - Wildcards are supported here to match file names
+- both name and order can be used as locator of a sheet, and the script will print the sheet name for confirm.
 
 ### Operations
 
@@ -137,13 +138,13 @@ cscript .\dev.vbs replace .\*\*.xlsx 1 "fromString" "toString"
 
     - This convert the output of `dev.vbs` from `Shift-JIS` into `UTF-8` and skip the text that failed to convert by using option "-c".
 
-- Add a non-generic feature to the dev branch for filling in other forms based on an overview file
+- Add a non-generic feature to the dev branch for filling in other forms based on an overview file by a key
 
   ```powershell
   cscript ./dev.vbs fill .\test\*dstFile* 4 "D9" D:\srcFile.xlsx ALL
   ```
 
-  
+  - now the script will assign the result to null actively if it can't find any information about the key in overview file
 
 ### TODO
 
