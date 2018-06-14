@@ -20,6 +20,7 @@ for each file in dstFileList
     wscript.echo replace(file,nowpath,".")
     set xlFile = xlApp.Workbooks.Open(file)
     set xlSheet = xlFile.Worksheets(sheetOrder)
+	wscript.echo xlSheet.name
     ' do some operation
     if operation = "get" then
         doGet()
@@ -77,7 +78,9 @@ Sub init()
     operation = wscript.Arguments(0)
     globPath = wscript.Arguments(1)
     sheetOrder = wscript.Arguments(2)
-    sheetOrder = CInt(sheetOrder)
+	if IsNumeric(sheetOrder) then
+		sheetOrder = CInt(sheetOrder)
+	end if
     if operation = "get" then
         searchRange = wscript.Arguments(3)
     elseif operation = "set" then
@@ -259,6 +262,8 @@ Sub doFill()
                     targetRange(i,7) = nameList(j,6)
                     targetRange(i,8) = nameList(j,7)
                     exit for
+				else
+					targetRange(i,1) = ""
                 end if
             next
         next
