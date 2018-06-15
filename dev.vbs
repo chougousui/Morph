@@ -17,10 +17,10 @@ init()
 On Error Resume Next
 for each file in dstFileList
     ' echo file name and open sheet
-    wscript.echo replace(file,nowpath,".")
     set xlFile = xlApp.Workbooks.Open(file)
     set xlSheet = xlFile.Worksheets(sheetOrder)
-	wscript.echo xlSheet.name
+    wscript.echo replace(file,nowpath,".") & vbTab & xlSheet.name
+
     ' do some operation
     if operation = "get" then
         doGet()
