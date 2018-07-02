@@ -9,6 +9,7 @@ Dim grepPattern
 Dim firstPattern,increPattern,offset,realOffset
 Dim fromString,toString
 Dim startPoint,srcFilePath,fillMethod,nameList,srcMaxRow
+Dim headerRangeAddress
 
 ''' main
 
@@ -26,6 +27,8 @@ for each file in dstFileList
         doGet()
     elseif operation = "set" then
         doSet()
+    elseif operation = "cat" then
+        doCat()
     elseif operation = "grep" then
         doGrep()
     elseif operation = "find" then
@@ -86,6 +89,8 @@ Sub init()
     elseif operation = "set" then
         searchRange = wscript.Arguments(3)
         toString = wscript.Arguments(4)
+    elseif operation = "cat" then
+        headerRangeAddress = wscript.Arguments(3)
     elseif operation = "grep" then
         grepPattern = wscript.Arguments(3)
     elseif operation = "find" then
@@ -136,6 +141,7 @@ Sub init()
 
     matchFiles()
 End Sub
+
 Sub clean()
     Set xlSheet = Nothing
     Set xlFile = Nothing
@@ -146,12 +152,44 @@ Sub clean()
     wscript.echo
     wscript.echo "ALL CLEANED!"
 End Sub
+
 Sub doGet()
     wscript.echo xlSheet.Range(searchRange).Value
 End Sub
+
 Sub doSet()
     xlSheet.Range(searchRange).Value = toString
 End Sub
+
+Sub doCat()
+    Dim headerRange,printRange
+    Dim targetUsedRow,targetUsedCol
+    Dim startCell,endCell
+    
+    set headerRange = xlSheet.Range(headerRangeAddress)
+    targetUsedRow = xlSheet.usedRange.Rows.Count
+    targetUsedCol = headerRange.Columns.Count + headerRange.Column - 1
+    
+    set startCell = xlSheet.Cells(headerRange.Row,headerRange.Column)
+    set endCell = xlSheet.Cells(targetUsedRow,targetUsedCol)
+    set printRange = xlSheet.Range(startCell,endCell)
+    wscript.echo printRange.Address
+    
+    tempArray = printRange.value
+    
+    for i = 1 to targetUsedRow - startCell.Row + 1
+        for j = 1 to targetUsedCol - startCell.Column + 1
+            wscript.StdOut.Write tempArray(i,j)
+            if (j < targetUsedCol - startCell.Column + 1) then
+                wscript.StdOut.Write vbTab
+            else
+                wscript.StdOut.Write vbCrlf
+            end if
+        next
+        
+    next
+End Sub
+
 Sub doGrep()
     ' find all cells
     dim rng
@@ -166,6 +204,7 @@ Sub doGrep()
         wscript.echo "can not find """ & grepPattern & """"
     End If
 End Sub
+
 Sub doFind()
     ' find all cells
     dim rng
@@ -180,6 +219,7 @@ Sub doFind()
         wscript.echo "can not find """ & grepPattern & """"
     End If
 End Sub
+
 Sub doFindComment()
     ' find all cells
     dim rng
@@ -196,10 +236,12 @@ Sub doFindComment()
         wscript.echo "can not find """ & grepPattern & """"
     End If
 End Sub
+
 Sub doReplace()
     ' replace all cells
     xlSheet.Cells.replace fromString,toString
 End Sub
+
 Sub doIncre()
     x1 = realOffset(0)
     x2 = realOffset(1)
@@ -231,6 +273,7 @@ Sub doIncre()
         wscript.echo "can not find """ & firstPattern & """"
     end if
 End Sub
+
 Sub doFill()
     ' exmple:  cscript ./dev.vbs fill .\test\*画面設計書* 4 "D9" D:\＠項目_完全\＠各種一覧\E_項 目一覧（営業事務システム）.xlsx ALL
     Dim srcUsedRow,targetUsedRow,targetMaxRow

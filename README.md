@@ -51,7 +51,7 @@ cscript .\dev.vbs get .\*\*.xlsx 1 "A1"
 
 ##### set
 
-Set the value of a specified positon in files
+Set the value of a specified position in files
 
 ```powershell
 cscript .\dev.vbs set .\*\*.xlsx 1 "A1" "toString"
@@ -59,6 +59,17 @@ cscript .\dev.vbs set .\*\*.xlsx 1 "A1" "toString"
 
 - Just like that in `get`
 - File will be saved by default, so remember to backup important files
+
+##### cat
+
+Print all data within the prompt range
+
+```powershell
+cscript .\dev.vbs cat .\*.xlsx 1 "B2:H2"
+```
+
+- "B2:H2" is only the header of the range that want to print, the script determines how many lines the file has automatically.
+- A file name, sheet name and `printRangeAddress` will appear in the output, therefore, if you want to get the similar outlook like a real `cat` function, it's recommended to use a specific file name as argument instead of a wildcard, and use other command like `head`,`tail`
 
 ##### grep
 
