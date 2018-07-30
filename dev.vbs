@@ -125,7 +125,7 @@ Sub init()
         set srcFile = xlApp.Workbooks.Open(srcFilePath,,True)
         set xlSheet1 = srcFile.Worksheets(1)
         srcUsedRow = xlSheet1.usedRange.Rows.Count
-        nameList = xlSheet1.Range(xlSheet1.Cells(6,2),xlSheet1.Cells(srcUsedRow,8)).value
+        nameList = xlSheet1.Range(xlSheet1.Cells(6,2),xlSheet1.Cells(srcUsedRow,9)).value
         srcFile.close(False)
         set xlSheet1 = Nothing
         set srcFile = Nothing
@@ -275,7 +275,7 @@ Sub doIncre()
 End Sub
 
 Sub doFill()
-    ' exmple:  cscript ./dev.vbs fill .\test\*画面設計書* 4 "D9" D:\＠項目_完全\＠各種一覧\E_項 目一覧（営業事務システム）.xlsx ALL
+    ' exmple:  cscript ./dev.vbs fill .\test\*画面設計書* 4 "D9" D:\＠項目_完全\＠各種一覧\E_項目一覧（営業事務システム）.xlsx PAGE
     Dim srcUsedRow,targetUsedRow,targetMaxRow
     Dim targetRange
     targetUsedRow = xlSheet.usedRange.Rows.Count
@@ -283,8 +283,8 @@ Sub doFill()
     startRow = startCell.Row
     startCol = startCell.Column
 
-    ' fill all
-    if fillMethod = "ALL" then
+    ' fill PAGE
+    if fillMethod = "PAGE" then
         ' get targetRange,and max row
         targetRange = xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+6)).value
         for rowNum = UBound(targetRange,1) to 1 step -1
@@ -305,8 +305,8 @@ Sub doFill()
                     targetRange(i,7) = nameList(j,6)
                     targetRange(i,8) = nameList(j,7)
                     exit for
-				else
-					targetRange(i,1) = ""
+                else
+                    targetRange(i,1) = ""
                 end if
             next
         next
@@ -314,7 +314,101 @@ Sub doFill()
         ' assign value
         xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+6)).value = targetRange
 
-    ' fill id only
+    ' fill TABLE
+    elseif fillMethod = "TABLE" then
+        ' get targetRange,and max row
+        targetRange = xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+6)).value
+        for rowNum = UBound(targetRange,1) to 1 step -1
+            if not targetRange(rowNum,2) = "" then
+                wscript.echo targetRange(rowNum,2)
+                targetMaxRow = rowNum
+                exit for
+            end if
+        next
+        wscript.echo targetMaxRow
+
+        ' edit file
+        for i=1 to targetMaxRow
+            for j=1 to srcMaxRow
+                if Trim(nameList(j,2)) = Trim(targetRange(i,2)) then
+                    targetRange(i,1) = nameList(j,1)
+                    targetRange(i,3) = nameList(j,3)
+                    targetRange(i,4) = nameList(j,4)
+                    targetRange(i,5) = nameList(j,5)
+                    targetRange(i,6) = nameList(j,6)
+                    targetRange(i,7) = nameList(j,7)
+                    targetRange(i,8) = nameList(j,8)
+                    exit for
+                else
+                    targetRange(i,1) = ""
+                end if
+            next
+        next
+
+        ' assign value
+        xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+6)).value = targetRange
+
+    ' fill FILE
+    elseif fillMethod = "FILE" then
+        ' get targetRange,and max row
+        targetRange = xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+4)).value
+        for rowNum = UBound(targetRange,1) to 1 step -1
+            if not targetRange(rowNum,2) = "" then
+                wscript.echo targetRange(rowNum,2)
+                targetMaxRow = rowNum
+                exit for
+            end if
+        next
+        wscript.echo targetMaxRow
+
+        ' edit file
+        for i=1 to targetMaxRow
+            for j=1 to srcMaxRow
+                if Trim(nameList(j,2)) = Trim(targetRange(i,2)) then
+                    targetRange(i,1) = nameList(j,1)
+                    targetRange(i,3) = nameList(j,5)
+                    targetRange(i,4) = nameList(j,6)
+                    targetRange(i,6) = nameList(j,7)
+                    exit for
+                else
+                    targetRange(i,1) = ""
+                end if
+            next
+        next
+
+        ' assign value
+        xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+4)).value = targetRange
+
+    ' fill REPORT
+    elseif fillMethod = "REPORT" then
+        ' get targetRange,and max row
+        targetRange = xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+1)).value
+        for rowNum = UBound(targetRange,1) to 1 step -1
+            if not targetRange(rowNum,2) = "" then
+                wscript.echo targetRange(rowNum,2)
+                targetMaxRow = rowNum
+                exit for
+            end if
+        next
+        wscript.echo targetMaxRow
+
+        ' edit file
+        for i=1 to targetMaxRow
+            for j=1 to srcMaxRow
+                if Trim(nameList(j,2)) = Trim(targetRange(i,2)) then
+                    targetRange(i,1) = nameList(j,1)
+                    targetRange(i,3) = nameList(j,5)
+                    exit for
+                else
+                    targetRange(i,1) = ""
+                end if
+            next
+        next
+
+        ' assign value
+        xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol+1)).value = targetRange
+
+    ' fill ID only
     elseif fillMethod = "ID" then
         ' get targetRange,and max row
         targetRange = xlSheet.Range(xlSheet.Cells(startRow,startCol-1),xlSheet.Cells(targetUsedRow,startCol)).value
