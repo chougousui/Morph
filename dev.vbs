@@ -10,6 +10,7 @@ Dim firstPattern,increPattern,offset,realOffset
 Dim fromString,toString
 Dim startPoint,srcFilePath,fillMethod,nameList,srcMaxRow
 Dim headerRangeAddress
+Dim WshShell
 
 ''' main
 
@@ -74,7 +75,11 @@ Sub init()
     end if
 
     ' get nowpath
-    nowpath = left(wscript.scriptfullname,instrrev(wscript.scriptfullname,"\")-1)
+    ' nowpath = left(wscript.scriptfullname,instrrev(wscript.scriptfullname,"\")-1)
+    Set WshShell = CreateObject("WScript.Shell")
+    nowpath = WshShell.CurrentDirectory
+    Set WshShell = Nothing
+    wscript.echo nowpath
 
     ' init and edit parameters
     ' required parameters
@@ -117,8 +122,8 @@ Sub init()
 
     ' last, launch excel, generate a filelist contains the targer files
     Set xlApp=CreateObject("Excel.Application")
-    Set fileList = CreateObject("Scripting.Dictionary")
-    Set dstFileList = CreateObject("Scripting.Dictionary")
+    Set fileList = CreateObject("System.Collections.ArrayList")
+    Set dstFileList = CreateObject("System.Collections.ArrayList")
 
     if operation = "fill" then
         ' get nameList information from srcFile
@@ -460,7 +465,7 @@ Sub matchFiles()
         tmpfileName = replace(file,nowpath,".")
         fileNameRegExp.Pattern = namePattern
         if fileNameRegExp.Test(tmpfileName) then
-            dstFileList.add file,""
+            dstFileList.add file
         end if
     next
 End Sub
@@ -472,7 +477,7 @@ Sub filetree(rootPath)
 
     ' add file under this folder into fileList
     for each file in files
-        fileList.add file.path,""
+        fileList.add file.path
     next
 
     ' do the same things to subFolders
