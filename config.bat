@@ -1,0 +1,1 @@
+doskey morph=cscript .\morph.vbs $*
