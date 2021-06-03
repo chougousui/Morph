@@ -101,3 +101,4 @@ UpgradeLog*.XML
 # Custom files
 test*.vbs
 assets/**/*.xls*
+.VSCodeCounter/

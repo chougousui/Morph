@@ -26,7 +26,9 @@ sub testAll()
     testPositive()
     testConflict()
     testIsRef()
-    testAtMostPairRef()
+    testIsPairRef()
+    testRequiredWith()
+    testRequiredAny()
 end sub
 '--------------------------------
 ' 目标字符串不能为空
@@ -102,16 +104,22 @@ sub testPositive()
     assertToBeTrue(v11)
 end sub
 '--------------------------------
-' 交叉验证: 两参数冲突,只能指定一个
-function conflict(params)
-    ' params 是一个二维数组[[参数名, 参数是否存在, 参数值]]
-    ' 目前 conflict 要求有且只有两个参数,否则返回false
-    if params.Count <> 2 then
+' 交叉验证: 两参数冲突,最多只能指定一个
+' 返回true表示验证通过
+function conflict(ctx)
+    ' ctx 是一个二维数组[[参数名, 参数是否存在, 参数值]]
+
+    ' 目前 conflict 要求有且只有两个参数
+    ' 规则书写错误一律false
+    if ctx.Count <> 2 then
         conflict = false
         exit function
     end if
 
-    conflict = not (params.item(0)(1) and params.item(1)(1))
+    firstExists = ctx.item(0)(1)
+    secondExists = ctx.item(1)(1)
+
+    conflict = not (firstExists and secondExists)
 end function
 
 sub testConflict()
@@ -190,7 +198,7 @@ function isPairRef(value)
     isPairRef = res
 end function
 
-sub testAtMostPairRef()
+sub testIsPairRef()
     v20 = isPairRef("A1")
     assertToBeFalse(v20)
 
@@ -215,11 +223,129 @@ sub testAtMostPairRef()
     v27 = isPairRef("A1:B1:")
     assertToBeFalse(v27)
 end sub
+'--------------------------------
+' 交叉验证: 若第一个参数有,则第二个参数也必须有
+' 返回true表示验证通过
+function requiredWith(ctx)
+    ' ctx 是一个二维数组[[参数名, 参数是否存在, 参数值]]
+
+    ' 目前 requiredWith 要求有且只有两个参数
+    ' 规则书写错误一律false
+    if ctx.Count <> 2 then
+        requiredWith = false
+        exit function
+    end if
+
+    firstExists = ctx.item(0)(1)
+    secondExists = ctx.item(1)(1)
+
+    requiredWith = not (firstExists and not secondExists)
+end function
+
+sub testRequiredWith()
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", true, 1)
+        .Add Array("range", true, "A1")
+    end with
+    v28 = requiredWith(ctx)
+    assertToBeTrue(v28)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", true, 1)
+        .Add Array("range", false, "")
+    end with
+    v29 = requiredWith(ctx)
+    assertToBeFalse(v29)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", false, "")
+        .Add Array("range", false, "")
+    end with
+    v30 = requiredWith(ctx)
+    assertToBeTrue(v30)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", false, "")
+        .Add Array("range", true, "A1")
+    end with
+    v31 = requiredWith(ctx)
+    assertToBeTrue(v31)
+end sub
+'--------------------------------
+' 交叉验证: 提到的参数必须要有一个被指定
+' 返回true表示验证通过
+function requiredAny(ctx)
+    ' ctx 是一个二维数组[[参数名, 参数是否存在, 参数值]]
+
+    ' 目前 requiredAny 要求最少1个条目
+    ' 规则书写错误一律false
+    if ctx.Count < 1 then
+        requiredAny = false
+        exit function
+    end if
+
+    temp = false
+    for each item in ctx
+        paramExists = item(1)
+        temp = temp or paramExists
+    next
+
+    requiredAny = temp
+end function
+
+sub testRequiredAny()
+    set ctx = CreateObject("System.Collections.ArrayList")
+    v32 = requiredAny(ctx)
+    assertToBeFalse(v32)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", false, 1)
+    end with
+    v33 = requiredAny(ctx)
+    assertToBeFalse(v33)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", false, "")
+        .Add Array("shtnm", false, "")
+    end with
+    v34 = requiredAny(ctx)
+    assertToBeFalse(v34)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", false, "")
+        .Add Array("shtnm", true, "A1")
+    end with
+    v35 = requiredAny(ctx)
+    assertToBeTrue(v35)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", true, 1)
+        .Add Array("shtnm", false, "")
+    end with
+    v36 = requiredAny(ctx)
+    assertToBeTrue(v36)
+
+    set ctx = CreateObject("System.Collections.ArrayList")
+    with ctx
+        .Add Array("shtord", true, 1)
+        .Add Array("shtnm", true, "A1")
+    end with
+    v37 = requiredAny(ctx)
+    assertToBeTrue(v37)
+end sub
 
 ' -------------------------------------------------------------------------
 ' 如果被include,将共用morph.vbs的参数列表,即 0: <subCommand>, 1: <wildcard> 2~: [options]
 ' 如果没有参数,说明是直接测试,需要运行测试函数
-if wscript.arguments.Unnamed.Count = 0 then
+if wscript.arguments.Count = 0 then
     testAll()
 end if
 ' 测试时使用   cscript ./validators.vbs | tail -n+4 | cat -n
