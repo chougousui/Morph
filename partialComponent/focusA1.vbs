@@ -3,33 +3,36 @@
 ' 2. 每一个sheet聚焦到A1
 ' 3. 整个文档聚焦到第一个非隐藏的sheet
 
-' 必要,组件的使用用例
-' return: Dict{"bash", "powershell"}
-function example()
-    set mDict = createObject("Scripting.Dictionary")
-    with mDict
+function configs()
+    ' 必要,组件的用例
+    ' Dict{"bash", "powershell"}
+    set example = createObject("Scripting.Dictionary")
+    with example
         .Add "bash", "morph focusA1 ./assets/test*/*.xlsx"
         .Add "powershell", "morph focusA1 .\assets\test*\*.xlsx"
     end with
-    set example = mDict
-end function
 
-' 必要,组件的操作权限
-' return: boolean
-function readonly()
-    ' 更改focus需要保存
+    ' 必要,组件的操作权限
+    ' true/false
     readonly = false
+
+    set mConfig = createObject("Scripting.Dictionary")
+    with mConfig
+        .Add "example", example
+        .Add "readonly", readonly
+    end with
+    set configs = mConfig
 end function
 
-' 必要,morph调用的组件主操作,包含验证过程
-sub extension(byRef xlFile, params)
-    ' focusA1没有动态参数验证
+' 必要
+function layeredProcess(byRef xlFile, byRef params)
+    ' 但没有内容
+    set layeredProcess = params
+end function
 
-    call afterCheck(xlFile, params)
-end sub
-
-' 单独测试组件时会使用的,不带参数校验的版本
-sub afterCheck(byRef xlFile, params)
+' 必要
+' para: xlWorkbook, arguments.Named
+sub realWork(byRef xlFile, byRef params)
     ' 每个sheet都需要先activate再操作focus到A1
     for each sheet in xlFile.worksheets
         if sheet.visible then
@@ -55,3 +58,6 @@ end sub
 
 ' 加载后的欢迎语句
 wscript.echo("component: grep.vbs loaded")
+
+
+'----------------------------------

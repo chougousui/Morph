@@ -1,75 +1,8 @@
-' 主文件
-' 包含许多基础组件(解析路径,加载外部文件)
-' 处理命令的相关操作(参数解析和显示, 抛出错误等)
+' 提供常用的基础功能
+' 1. 解析路径
+' 2. 加载外部文件
+' 3. 字符串到函数(以验证规则取验证函数会用到)
 ' https://docs.microsoft.com/en-us/previous-versions//xe43cc8d(v=vs.85)
-
-' 入口函数
-sub main()
-    dim subCommand     ' 子命令
-    dim wildcard       ' 操作对象路径描述
-
-    dim options        ' 具名参数列表,用于传递给子组件
-    dim files          ' 解析通配符后的文件名列表
-
-    ' 只在主脚本中使用无命名参数
-    ' 用例: morph get ./assets/*.xls /range:A1
-    if wscript.Arguments.Unnamed.Count < 2 then
-        msg = "invalid base arguments" & vbcrlf _
-            & vbcrlf _
-            & helpMessage()
-
-        call err.raise(5, "", msg)
-    end if
-
-    ' 获取必要参数
-    subCommand = wscript.Arguments.Unnamed(0)
-    wildcard = wscript.Arguments.Unnamed(1)
-    set options = wscript.Arguments.Named
-
-    ' 根据子命令加载同名组件
-    pluginPath = "./components/" & subCommand & ".vbs"
-    Include(resolvePath(pluginPath))
-
-    ' 加载验证函数
-    Include(resolvePath("./validators.vbs"))
-
-    ' 加载组件包装器
-    Include(resolvePath("./componentWrapper.vbs"))
-
-    ' 使用加载到的验证函数,静态验证组件使用的具名参数
-    call wrappedValidation(subCommand, options)
-
-    ' 加载文件操作函数
-    Include(resolvePath("./fileOperator.vbs"))
-
-    ' 一切验证就绪后开始解析操作文件,而后打开app操作
-    set files = resolvePaths(wildcard)
-    call processFiles(files, options)
-end sub
-
-' 显示本工具的帮助信息
-' return: string
-function helpMessage()
-    availableSubCommands = Array("eg", "focusA1", "get", "set", "grep")
-
-    helpMessage = "usage:" & vbcrlf _
-                & "morph <subCommand> <wildcard> [options]" & vbcrlf
-
-    helpMessage = helpMessage _
-                & vbcrlf _
-                & "available subCommand:" & vbcrlf
-
-    for each command in availableSubCommands
-        helpMessage = helpMessage & "- " & command & vbcrlf
-    next
-
-    helpMessage = helpMessage _
-                & vbcrlf _
-                & "e.g.(bash):" & vbcrlf _
-                & "morph eg . /help:" & vbcrlf _
-                & "e.g.(powershell):" & vbcrlf _
-                & "morph eg . /help"
-end function
 
 ' 调用powershell功能来解析通配符路径
 ' return: List{path1, path2, }
@@ -114,6 +47,7 @@ end function
 ' 引用外部文件
 ' return: error
 Sub Include(fSpec)
+    ' wscript.echo(fSpec)
     ' 加载外部文件
     ' 发生在打开文件之前,直接抛出错误即可,无需清理资源
     With CreateObject("Scripting.FileSystemObject")
@@ -145,7 +79,6 @@ function myGetRef(target, needPrint)
     set myGetRef = nothing
 end function
 
-
-
-'---------------------------------
+' 程序的入口文件放在 entry.vbs 中的main函数中
+Include(resolvePath("./entry.vbs"))
 main()

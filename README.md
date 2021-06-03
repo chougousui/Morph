@@ -6,22 +6,22 @@ A modular, ordinary, ready-to-use, parallelable CLI tool on windows for operatin
 
 ## Get Started
 
-in bash/zsh
+in Bash/Zsh
 
 ```shell
-source /path/to/morph/config.sh
+cd /path/to/morph
+source ./config.sh
 morph /help:
 morph eg . /help:
-morph eg ./assets/test*/*.xlsx /test:abc /anything:123
 ```
 
-in powershell
+in PowerShell
 
 ```powershell
-. \path\to\morph\config.ps1
+cd \path\to\morph
+. .\config.ps1    # Or type the contents of this file manually
 morph /help
-morph eg . /help
-morph eg .\assets\test*\*.xlsx /test:abc /anything:123
+morph eg /help
 ```
 
 ## Function list
@@ -44,7 +44,8 @@ Morph旨在提供一些公用的方法(加载外部组件,匹配操作文件,验
 ## Development notes
 
 1. VBS对文件的换行方式很敏感,必须是CRLF,否则报错
-2. 鉴于VBS的错误处理弱到难以打印调用栈,模块本身最好能被单独调用 `cscript ./components/xxx.vbs`,这样有利于在开发新组件时发现编译时错误与运行时错误的具体位置
+2. VBS代码的中文支持也不大好
+3. 鉴于VBS的错误处理弱到难以打印调用栈,任何文件都最好能被单独调用 `cscript ./utils/xxx.vbs`,这样有利于在开发新功能时发现编译时错误与运行时错误的具体位置
 
 ## End notes
 
